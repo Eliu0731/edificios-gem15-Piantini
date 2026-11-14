@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Edificios GEM-15</title>
+<meta name="description" content="Visor 3D de alturas estimadas de edificios con GEM-15 (DSM − DTM) y huellas de Open Buildings, con varios mapas base.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f6f78'/%3E%3Cpath fill='%23f7e08a' d='M6 26V14h6v12zm8 0V6h6v20zm8 0V11h4v15z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="ui">
+  <section class="panel" aria-label="Controles del visor">
+    <div class="panel-head">
+      <div>
+        <h1>Alturas estimadas de edificios</h1>
+        <p class="sub">GEM-15 (DSM − DTM) sobre huellas de Open Buildings</p>
+      </div>
+      <button class="ghost" id="collapse" type="button" aria-expanded="true" aria-controls="panelBody">Ocultar</button>
+    </div>
+
+    <div class="body-wrap" id="panelBody">
+      <fieldset class="field">
+        <legend class="lbl">Mapa base</legend>
+        <div class="chips" id="bases"></div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend class="lbl">Altura mostrada</legend>
+        <div class="seg">
+          <label><input type="radio" name="campo" id="f-p95" value="h_p95" checked><span>Máxima de celda (p95)</span></label>
+          <label><input type="radio" name="campo" id="f-dsm" value="h_dsm"><span>Media de celda</span></label>
+        </div>
+        <p class="hint" id="hint"></p>
+      </fieldset>
+
+      <div class="field">
+        <span class="lbl">Distribución de alturas</span>
+        <svg class="chart" id="hist" viewBox="0 0 300 120" role="img" aria-label="Histograma de alturas estimadas"></svg>
+      </div>
+
+      <dl class="stats" id="stats"></dl>
+
+      <div class="slider">
+        <div class="slider-row"><label class="lbl" for="exag">Exageración vertical</label><output id="exagOut" for="exag">×1</output></div>
+        <input type="range" id="exag" min="1" max="5" step="0.5" value="1">
+      </div>
+
+      <div class="slider">
+        <div class="slider-row"><label class="lbl" for="op">Opacidad de edificios</label><output id="opOut" for="op">92 %</output></div>
+        <input type="range" id="op" min="0.3" max="1" step="0.05" value="0.92">
+      </div>
+
+      <div class="slider">
+        <div class="slider-row"><label class="lbl" for="amin">Área mínima de huella</label><output id="aminOut" for="amin">0 m²</output></div>
+        <input type="range" id="amin" min="0" max="300" step="10" value="0">
+      </div>
+
+      <div class="btns">
+        <button class="btn" id="v3d" type="button">Vista 3D</button>
+        <button class="btn" id="vplan" type="button">Planta</button>
+        <button class="btn" id="vreset" type="button">Reiniciar</button>
+      </div>
+
+      <p class="note">Cada celda de GEM-15 mide 15 m y la mayoría de las casas son más pequeñas. La altura mezcla techo, suelo y vegetación, por eso sirve para comparar zonas y no para medir un edificio concreto.</p>
+      <p class="credit" id="credit"></p>
+      <p class="credit"><a href="data/edificios_altura_gem15.geojson" download>Descargar datos (GeoJSON)</a></p>
+    </div>
+  </section>
+</div>
+
+<script src="js/data.js"></script>
+<script src="vendor/maplibre-gl.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
