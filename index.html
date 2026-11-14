@@ -466,8 +466,11 @@ return maplibregl$1;
     return style;
   }
 
-  // Se ejecuta cada vez que termina de cargar un estilo (al inicio y al cambiar de mapa base)
+  // Añade (o repone) las capas de edificios sobre el estilo actual. Se llama al terminar de
+  // cargar un estilo (al inicio y al cambiar de mapa base) y también desde 'styledata' como red
+  // de seguridad: sin ella, un cambio de estilo que no emita 'style.load' dejaba el mapa sin edificios.
   function addDataLayers() {
+    if (!map || !map.getStyle() || map.getLayer('ext')) return;   // ya están: nada que hacer
     ready = false;
     // Los estilos vectoriales traen sus propios edificios 3D: se quitan para no duplicar los nuestros
     (map.getStyle().layers || []).filter(function (l) { return l.type === 'fill-extrusion'; })
@@ -497,7 +500,9 @@ return maplibregl$1;
     if (!map) return;
     ready = false;
     if (popup) popup.remove();
-    map.setStyle(styleFor(key));    // 'style.load' vuelve a añadir los edificios
+    // diff:false obliga a recargar el estilo completo. Con el valor por defecto MapLibre intenta
+    // aplicar solo las diferencias, elimina nuestras capas y no vuelve a emitir 'style.load'.
+    map.setStyle(styleFor(key), { diff: false });
   }
 
   function fitOptions() {
@@ -546,6 +551,7 @@ return maplibregl$1;
     popup.on('close', function () { if (ready) map.setFilter('sel', ['==', ['id'], -1]); });
 
     map.on('style.load', addDataLayers);
+    map.on('styledata', function () { if (map.isStyleLoaded()) addDataLayers(); });
 
     map.on('load', function () {
       map.on('mouseenter', 'ext', function () { map.getCanvas().style.cursor = 'pointer'; });
